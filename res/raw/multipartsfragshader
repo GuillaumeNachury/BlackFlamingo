@@ -1,0 +1,62 @@
+#extension GL_OES_EGL_image_external : require
+
+precision mediump float;
+
+uniform samplerExternalOES sTexture;
+varying vec2 vTextureCoord;
+varying vec2 v_blurTexCoords[14];
+float w[9] = float[9](0.077847,0.123317,0.077847,0.123317,0.195346,0.123317,
+0.077847,0.123317,0.077847) ;
+
+void blur(inout vec4 s){
+	int l;
+	for(l=0; l<9;l++){
+		s+= texture2D(sTexture,v_blurTexCoords[l]*w[l]);
+	}
+}
+
+void main(){
+	//BLOOM params.
+	int l = -2;
+	int c = -2;
+	vec4 s = vec4(4.0);
+	
+	int p = 0;
+	float t = 0.5;
+	float sc = 0.6; 
+	int isBloom = 0;
+	//EOF BLOOM params
+	
+	//common
+	int loop;
+	
+	vec4 col = texture2D(sTexture, vTextureCoord); 
+	
+	//B&W
+	if(vTextureCoord.x < 0.5 && vTextureCoord.y < 0.5){
+        col = vec4(col.g,col.g,col.g,1.0);   
+    }
+    //BLOOM
+    if(vTextureCoord.x >= 0.5 && vTextureCoord.y < 0.5){
+    s = texture2D(sTexture, vTextureCoord);
+    isBloom = 1;
+	   	for(loop = 0; loop<1; loop++) blur(s);
+	   	
+	    if(length(s) > t){
+	   		col = s*sc;
+	   }
+    }
+    
+    if(vTextureCoord.x > 0.5 && vTextureCoord.y > 0.5){
+    float sum = col.r + col.g + col.b;
+    sum/=3.0;
+    	if(sum > 0.3){
+    		 col = vec4(1.0);   
+    	}
+        else col = vec4(0.0);   
+    }
+
+  
+    
+	 gl_FragColor = col;
+}

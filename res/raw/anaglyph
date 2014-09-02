@@ -1,0 +1,41 @@
+#extension GL_OES_EGL_image_external : require
+
+precision mediump float;
+
+uniform samplerExternalOES sTexture;
+uniform float uScreenHeight;
+uniform float uScreenWidth;
+
+varying vec2 vTextureCoord;
+
+vec3 blurify(in col){
+	float d = (1.0/uScreenWidth)*20.0;
+	vec3 ac = vec3(0.0);
+	
+	for(int l = -1; l <3; l++){
+		for(int c = -1;c<3; c++){
+			if(l!=0 && c!=0){
+				ac+= texture2D(sTexture, vTextureCoord+vec2(c,l));
+			}
+		}
+	}
+	ac *= 0.125;
+	
+	return ac.rgb;
+
+}
+
+void main(){
+vec2 p = vTextureCoord;
+	//p.x *= 1.5;
+	
+//	vec4 col = texture2D(sTexture, vTextureCoord);
+	
+	//col.r =  texture2D(sTexture, vec2(vTextureCoord.x-d, vTextureCoord.y)).r;
+	//col.b =  texture2D(sTexture, vec2(vTextureCoord.x+d, vTextureCoord.y)).b;
+	
+	
+	
+		   
+	gl_FragColor = vec4(blurify(texture2D(sTexture, vTextureCoord)),1.0);
+}
