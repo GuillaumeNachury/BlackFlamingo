@@ -218,10 +218,13 @@ public class MainActivity extends Activity implements OnClickListener{
 			break;
 			
 		case R.id.selectColor:
+			resetAllColorButton();
 			//ToDo catch the pixel 
 			break;
 			
 		case R.id.colorButton:
+			resetAllColorButton();
+			
 			//ToDo open circle color 
 			break;
 
@@ -229,6 +232,15 @@ public class MainActivity extends Activity implements OnClickListener{
 			break;
 		}
 		
+	}
+	
+	public void resetAllColorButton(){
+		isActivateSatButton = false;
+		isActivateTolButton = false;
+		isActivateLumButton = false;
+		tolButton.getBackground().clearColorFilter();
+		lumButton.getBackground().clearColorFilter();
+		satButton.getBackground().clearColorFilter();	
 	}
 
 	public FlamingoViewer getFv() {
