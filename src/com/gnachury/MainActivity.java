@@ -14,6 +14,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gnachury.blackflamingo.R;
@@ -27,7 +28,7 @@ public class MainActivity extends Activity implements OnClickListener{
 
 	private final static String tag = "MainActivity";
 	private FlamingoViewer fv;
-	private Button tolButton, satButton, lumButton, selectColor, chooseColor;
+	private ImageView tolButton, satButton, lumButton, selectColor, chooseColor;
 	private float screenHeight;
 	private float tolValue = 0;
 	private float satValue = 0;
@@ -47,12 +48,12 @@ public class MainActivity extends Activity implements OnClickListener{
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.activity_main);
 		setFv((FlamingoViewer)findViewById(R.id.renderer_view));
-		tolButton = (Button)findViewById(R.id.tolerance);
-		satButton = (Button)findViewById(R.id.saturation);
-		lumButton = (Button)findViewById(R.id.luminance);
+		tolButton = (ImageView)findViewById(R.id.tolerance);
+		satButton = (ImageView)findViewById(R.id.saturation);
+		lumButton = (ImageView)findViewById(R.id.luminance);
 		textDebug = (TextView)findViewById(R.id.texttodebug);
-		selectColor = (Button)findViewById(R.id.selectColor);
-		chooseColor = (Button)findViewById(R.id.colorButton);
+		selectColor = (ImageView)findViewById(R.id.selectColor);
+		chooseColor = (ImageView)findViewById(R.id.colorButton);
 
 		//Add listener 
 		tolButton.setOnClickListener(this);
@@ -177,7 +178,6 @@ public class MainActivity extends Activity implements OnClickListener{
 			else{
 				isActivateOnTouch = false;
 				isActivateTolButton = false;
-				
 				tolButton.getBackground().clearColorFilter();
 			}
 			
@@ -233,6 +233,7 @@ public class MainActivity extends Activity implements OnClickListener{
 		}
 		
 	}
+	
 	
 	public void resetAllColorButton(){
 		isActivateSatButton = false;
