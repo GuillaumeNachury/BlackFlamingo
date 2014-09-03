@@ -20,6 +20,7 @@ import android.hardware.Camera.Size;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.TextView;
@@ -54,14 +55,20 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 		_setup();
 	}
 	
-	@Override
+	public FlamingoViewer(Context context,AttributeSet attr) {
+		super(context, attr);
+		_context = context;
+		_setup();
+	}
+	
+	/*@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		// TODO Auto-generated method stub
 		Log.e("Shader", "Changing");
 		changeShader();
 		return super.onTouchEvent(event);
 	}
-	
+	*/
 	
 	private void _setup(){
 		_quad = new Quad();
@@ -74,7 +81,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		try {
-			mOffscreenShader.setProgram(R.raw.vertex_shader, R.raw.fragment_shader, _context);
+			mOffscreenShader.setProgram(R.raw.vertex_shader, R.raw.original, _context);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -95,6 +102,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 		
 		_camera.stopPreview();
 		try {
+		
 			_camera.setPreviewTexture(_currentTex);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -116,7 +124,8 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 			_cameraW = psize.get(i).width;
 			_cameraH = psize.get(i).height;		
 
-		}	
+		}
+		param.setRecordingHint(true);
 		
 		
 		if(_context.getResources().getConfiguration().orientation == 

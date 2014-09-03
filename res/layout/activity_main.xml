@@ -1,0 +1,75 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <com.gnachury.ui.FlamingoViewer
+        android:id="@+id/renderer_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/texttodebug"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:textColor="@android:color/white"
+        android:text="TextView" />
+
+    <Button
+        android:id="@+id/selectColor"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"      
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/select" />
+
+    <Button
+        android:id="@+id/colorButton"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/color"
+        android:layout_marginTop="@dimen/buttonverticalgap"
+        android:layout_marginRight="@dimen/buttonverticalgap" />
+
+    <Button
+        android:id="@+id/luminance"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/colorButton"
+        android:background="@drawable/v" 
+        android:layout_marginTop="@dimen/buttonverticalgap"
+        android:layout_marginRight="@dimen/buttonverticalgap"/>
+
+    <Button
+        android:id="@+id/saturation"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/tolerance"
+        android:background="@drawable/s" 
+        android:layout_marginTop="@dimen/buttonverticalgap"
+        android:layout_marginRight="@dimen/buttonverticalgap"/>
+
+    <Button
+        android:id="@+id/tolerance"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/luminance"
+        android:background="@drawable/tolerance" 
+        android:layout_marginTop="@dimen/buttonverticalgap"
+        android:layout_marginRight="@dimen/buttonverticalgap"/>
+
+</RelativeLayout>
