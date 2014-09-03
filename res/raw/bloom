@@ -1,0 +1,25 @@
+#extension GL_OES_EGL_image_external : require
+
+// @author : Guillaume Nachury
+// @description : Simple Bloom shader
+
+precision mediump float;
+
+uniform samplerExternalOES sTexture;
+uniform float uScreenHeight;
+uniform float uScreenWidth;
+
+varying vec2 vTextureCoord;
+
+void main(void) {
+	float threshold = 1.0;
+    vec3 magicV = vec3(0.2125, 0.7154, 0.0721);
+    vec4 col = texture2D(sTexture, vTextureCoord);
+
+    float lum = dot(magicV, col.rgb);
+    lum = max(0.0, lum - threshold);
+    col.rgb *= sign(lum);
+    col.a = 1.0;
+
+    gl_FragColor = col;
+}
