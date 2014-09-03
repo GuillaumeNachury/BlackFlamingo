@@ -128,16 +128,19 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 								//tolerance : 0 <= value <= 60
 								tolValue =  (60 - (y/screenHeight * 60f));
 			    				textDebug.setText("tolerance " + tolValue + " y=" + y);
+			    				fv.updateShaderParameter(ShaderParam.TOLERANCE, tolValue);
 								break;
 							case R.id.saturation:
 								//saturation : 0 <= value <= 1
 								satValue =  (1 - (y/screenHeight));
 			    				textDebug.setText("saturation " + satValue + " y=" + y);
+			    				fv.updateShaderParameter(ShaderParam.SATURATION, satValue);
 								break;							
 							case R.id.luminance:
 								//luminance : 0 <= value <= 1
 								lumValue =  (1 - (y/screenHeight));
 			    				textDebug.setText("luminance " + lumValue + " y=" + y);
+			    				fv.updateShaderParameter(ShaderParam.VALUE, lumValue);
 								break;
 	
 							default:

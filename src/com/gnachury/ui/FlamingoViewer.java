@@ -7,6 +7,7 @@ import java.util.List;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import com.gnachury.ShaderParam;
 import com.gnachury.blackflamingo.R;
 import com.gnachury.util.OESTexture;
 import com.gnachury.util.Shader;
@@ -45,8 +46,14 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	private int _cameraH;
 	private Context _context;
 	
-	/* test */
-	private boolean f = true;
+	/* ******* Shader variables ******* */
+	private float _tolerance = 10.0f;
+	private float _saturation = .0f;
+	private float _value = .0f;
+	private float _selectedColor = 0.0f;
+	private float _newHue = (float) ((1.0/360.0)*240.0);
+	
+	
 	
 
 	public FlamingoViewer(Context context) {
@@ -61,14 +68,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 		_setup();
 	}
 	
-	/*@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		// TODO Auto-generated method stub
-		Log.e("Shader", "Changing");
-		changeShader();
-		return super.onTouchEvent(event);
-	}
-	*/
+
 	
 	private void _setup(){
 		_quad = new Quad();
@@ -81,7 +81,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		try {
-			mOffscreenShader.setProgram(R.raw.vertex_shader, R.raw.original, _context);
+			mOffscreenShader.setProgram(R.raw.vertex_shader, R.raw.fragment_shader, _context);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -125,7 +125,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 			_cameraH = psize.get(i).height;		
 
 		}
-		param.setRecordingHint(true);
+		//param.setRecordingHint(true);
 		
 		
 		if(_context.getResources().getConfiguration().orientation == 
@@ -167,19 +167,22 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 			int uTransformM = mOffscreenShader.getHandle("uTransformM");
 			int uOrientationM = mOffscreenShader.getHandle("uOrientationM");
 			int uRatioV = mOffscreenShader.getHandle("ratios");
-			/*int uScreenWidth = mOffscreenShader.getHandle("uScreenWidth");
-			int uScreenHeight = mOffscreenShader.getHandle("uScreenHeight");
-			int uROffset = mOffscreenShader.getHandle("uROffset");
-			Double dt = (double) (new Date()).getTime();*/
+			int uHueTolerance = mOffscreenShader.getHandle("uHueTolerance");
+			int uSaturation = mOffscreenShader.getHandle("uSaturation");
+			int uValue = mOffscreenShader.getHandle("uValue");
+			int uSelectedHue = mOffscreenShader.getHandle("uSelectedHue");
+			int uNewHue = mOffscreenShader.getHandle("uNewHue");
+			
 			
 			GLES20.glUniformMatrix4fv(uTransformM, 1, false, mTransformM, 0);
 			GLES20.glUniformMatrix4fv(uOrientationM, 1, false, mOrientationM, 0);
 			GLES20.glUniform2fv(uRatioV, 1, mRatio, 0);
-			/*
-			GLES20.glUniform1f(uScreenWidth, (float)glViewPortW);
-			GLES20.glUniform1f(uScreenHeight, (float)glViewPortH);
-			GLES20.glUniform1f(uROffset, (float)Math.cos(dt));*/
 			
+			GLES20.glUniform1f(uHueTolerance, _tolerance);
+			GLES20.glUniform1f(uSaturation, _saturation);
+			GLES20.glUniform1f(uValue, _value);
+			GLES20.glUniform1f(uSelectedHue, _selectedColor);
+			GLES20.glUniform1f(uNewHue, _newHue);
 			
 			GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 			GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, _oesTex.getTextureId());
@@ -190,7 +193,33 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 		
 	}
 	
-	
+	/**
+	 * 
+	 * @param p Parametre a mettre à jour En reference à ShaderParam
+	 * @param d Valeur du parametre
+	 */
+	public void updateShaderParameter(int p, float d){
+		switch (p) {
+		case ShaderParam.TOLERANCE:
+			_tolerance = d;
+			break;
+		case ShaderParam.SATURATION:
+			_saturation = d;
+			break;
+		case ShaderParam.VALUE:
+			_value = d;
+			break;
+		case ShaderParam.SELECTED_HUE:
+			_selectedColor = d;
+			break;
+		case ShaderParam.NEW_HUE:
+			_newHue = d;
+			break;
+
+		default:
+			break;
+		}
+	}
 	
 	public void changeShader(){
 		try {

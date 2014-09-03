@@ -16,7 +16,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:textColor="@android:color/white"
-        android:text="TextView" />
+        android:text="Black Flamingo" />
 
     <ImageView
         android:id="@+id/selectColor"

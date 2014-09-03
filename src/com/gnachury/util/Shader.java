@@ -15,6 +15,8 @@ public class Shader {
 	private String vertexSource;
 	private String fragmentSource;
 	
+	static String TOLERANCE = "tolerance";
+	
 	//hashmap for storing uniform/attribute handles
 	private final HashMap<String, Integer> mShaderHandleMap = new HashMap<String, Integer>();
 	
