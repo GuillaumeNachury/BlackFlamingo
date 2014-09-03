@@ -2,6 +2,9 @@
 
 // @author : Guillaume Nachury
 // @description : Simple Bloom shader
+// *******************************************
+//    A OPTIMISER !! trop de frames droppées
+// *******************************************
 
 precision mediump float;
 
@@ -11,15 +14,32 @@ uniform float uScreenWidth;
 
 varying vec2 vTextureCoord;
 
-void main(void) {
-	float threshold = 1.0;
-    vec3 magicV = vec3(0.2125, 0.7154, 0.0721);
-    vec4 col = texture2D(sTexture, vTextureCoord);
+void main()
+{
+   vec4 sum = vec4(0);
+   int j;
+   int i;
 
-    float lum = dot(magicV, col.rgb);
-    lum = max(0.0, lum - threshold);
-    col.rgb *= sign(lum);
-    col.a = 1.0;
-
-    gl_FragColor = col;
+   for( i= -4 ;i < 4; i++)
+   {
+        for (j = -3; j < 3; j++)
+        {
+            sum += texture2D(sTexture, vTextureCoord + vec2(j, i)*0.004) * 0.25;
+        }
+   }
+       if (texture2D(sTexture, vTextureCoord).r < 0.3)
+    {
+       gl_FragColor = sum*sum*0.012 + texture2D(sTexture, vTextureCoord);
+    }
+    else
+    {
+        if (texture2D(sTexture, vTextureCoord).r < 0.5)
+        {
+            gl_FragColor = sum*sum*0.009 + texture2D(sTexture, vTextureCoord);
+        }
+        else
+        {
+            gl_FragColor = sum*sum*0.0075 + texture2D(sTexture, vTextureCoord);
+        }
+    }
 }
