@@ -43,7 +43,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 	private TextView textDebug;
 	private int selectButtonId;
 	private int selectPixelColor;
-	private int selectColorPickerAngle;
+	private float selectColorPickerAngle;
 	private ColorPicker colorPick;
 
 	
@@ -95,8 +95,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 	        	float[] colors = new float[3];
 	    		Color.colorToHSV(color, colors);
 	    		//set the angle value 
-	        	selectColorPickerAngle = (int) colors[0];
+	        	selectColorPickerAngle = (float) colors[0];
 	        	textDebug.setText("color = " +  colors[0]);
+	        		
+	        	fv.updateShaderParameter(ShaderParam.NEW_HUE, (float)((1.0/360.0)*selectColorPickerAngle));
 	        }
 	    });
 
