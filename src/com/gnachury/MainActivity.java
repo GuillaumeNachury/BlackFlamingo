@@ -1,6 +1,8 @@
 package com.gnachury;
 
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffColorFilter;
@@ -31,10 +33,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 	private FlamingoViewer fv;
 	private ImageView tolButton, satButton, lumButton, selectColor, chooseColor;
 	private float screenHeight;
+	private float screenWidth;
 	private float tolValue = 0;
 	private float satValue = 0;
 	private float lumValue = 0;
-	float[] colors;
+	float[] colors, pixelColors;
 	private boolean isActivateSatButton = false;
 	private boolean isActivateLumButton = false;
 	private boolean isActivateTolButton = false;
@@ -42,7 +45,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 	private boolean isOpenChooseColor = false;
 	private TextView textDebug;
 	private int selectButtonId;
-	private int selectPixelColor;
+	private int grabPixelColor;
+	private int selectPixelColorHSV;
 	private int selectColorPickerAngle;
 	private ColorPicker colorPick;
 
@@ -51,10 +55,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, 
-				WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.activity_main);
-		setFv((FlamingoViewer)findViewById(R.id.renderer_view));
+		fv = (FlamingoViewer)findViewById(R.id.renderer_view);
+		fv.setDrawingCacheEnabled(true);
+		
 		tolButton = (ImageView)findViewById(R.id.tolerance);
 		satButton = (ImageView)findViewById(R.id.saturation);
 		lumButton = (ImageView)findViewById(R.id.luminance);
@@ -92,7 +97,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 		colorPick.setOnColorChangedListener(new OnColorChangedListener() {
 	        @Override
 	        public void onColorChanged(int color) {
-	        	float[] colors = new float[3];
+	        	colors = new float[3];
 	    		Color.colorToHSV(color, colors);
 	    		//set the angle value 
 	        	selectColorPickerAngle = (int) colors[0];
@@ -111,7 +116,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 	    	//Screen dimensions
 	    	Display display = getWindowManager().getDefaultDisplay(); 
 	    	int height = display.getHeight();  // deprecated
+	    	int width = display.getWidth();  // deprecated
 	    	screenHeight = height;
+	    	screenWidth = width;
 	    	
 	    	for (int i = 0; i < pointerCount; i++)
 	    	{
@@ -249,8 +256,19 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 			
 		case R.id.selectColor:
 			resetAllColorButton();
+			
+			fv.setSelectColor(true);
 			//Purple
-			colorPick.setOldCenterColor(Color.argb(255,128,0,128));
+			//colorPick.setOldCenterColor(Color.argb(255,128,0,128));
+			
+			/*Bitmap bm = fv.getDrawingCache();
+			grabPixelColor = bm.getPixel(fv.getWidth() / 2, fv.getHeight()/ 2);
+			pixelColors  = new float[3];
+    		Color.colorToHSV(grabPixelColor, pixelColors);
+    		selectPixelColorHSV = (int) pixelColors[0];
+    		colorPick.setOldCenterColor(grabPixelColor);
+    		textDebug.setText("color = " +  grabPixelColor);*/
+    	//	fv.setDrawingCacheEnabled(false);
 			break;
 			
 		case R.id.colorButton:
@@ -330,8 +348,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 	    colorPickerDialog.show();
 	}
 	*/
-	
-	
 	
 
 	public FlamingoViewer getFv() {

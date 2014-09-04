@@ -1,6 +1,10 @@
 package com.gnachury.ui;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.IntBuffer;
 import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -8,13 +12,17 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.os.Environment;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import com.gnachury.ShaderParam;
 import com.gnachury.blackflamingo.R;
@@ -25,7 +33,8 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 
 	private Quad _quad;
 	private Camera _camera;
-	
+	private boolean selectColor;
+
 	private final Shader mOffscreenShader = new Shader();
 	private float[] mTransformM = new float[16];
 	private float[] mOrientationM = new float[16];
@@ -147,8 +156,13 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 
 	@Override
 	public synchronized void onDrawFrame(GL10 gl) {
-		GLES20.glClearColor(1.0f, 0.3f, 0.2f, 1.0f);
+		GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+		
+		if(selectColor){
+			SavePNG(glViewPortW/2,glViewPortH/2,10,10,"Shader.jpg",gl);
+		}
+	
 		
 		if(_isDirty){
 			_isDirty = false;
@@ -236,5 +250,87 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 		requestRender();
 		
 	}
+	
+	public void getPixel(GL10 gl){
+		int b[] = new int [1];
+		IntBuffer ib=IntBuffer.wrap(b);
+	    ib.position(0);
+		gl.glReadPixels(glViewPortW/2, glViewPortH/2, 1, 1, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, ib);
+		int pix=b[0];
+        int pb=(pix>>16)&0xff;
+        int pr=(pix<<16)&0x00ff0000;
+        int pix1=(pix&0xff00ff00) | pr | pb;
+		Log.e("Flaming","color = " + pix1  );
+		selectColor = false;
+	}
+	
+	public static Bitmap SavePixels(int x, int y, int w, int h, GL10 gl)
+	{  
+	    int b[]=new int[w*h];
+	    int bt[]=new int[w*h];
+	    IntBuffer ib=IntBuffer.wrap(b);
+	    ib.position(0);
+	    gl.glReadPixels(x, y, w, h, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, ib);
+
+	    /*  remember, that OpenGL bitmap is incompatible with 
+	        Android bitmap and so, some correction need.
+	     */   
+	    for(int i=0; i<h; i++)
+	    {         
+	        for(int j=0; j<w; j++)
+	        {
+	            int pix=b[i*w+j];
+	            int pb=(pix>>16)&0xff;
+	            int pr=(pix<<16)&0x00ff0000;
+	            int pix1=(pix&0xff00ff00) | pr | pb;
+	            bt[(h-i-1)*w+j]=pix1;
+	        }
+	    }              
+	    Bitmap sb= Bitmap.createBitmap(bt, w, h, Bitmap.Config.ARGB_8888);
+	    return sb;
+	}
+
+	public static void SavePNG(int x, int y, int w, int h, String name, GL10 gl)
+	{
+	    Bitmap bmp=SavePixels(x,y,w,h,gl);
+	    try
+	    {
+	        FileOutputStream fos=new FileOutputStream(Environment.getExternalStorageDirectory()
+                    + File.separator + name);
+	        bmp.compress(CompressFormat.PNG, 100, fos);
+	        try
+	        {
+	            fos.flush();
+	        }
+	        catch (IOException e)
+	        {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	        }
+	        try
+	        {
+	            fos.close();
+	        }
+	        catch (IOException e)
+	        {
+	            // TODO Auto-generated catch block
+	            e.printStackTrace();
+	        }
+	    }
+	    catch (FileNotFoundException e)
+	    {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+	    }              
+	}
+	
+	public boolean isSelectColor() {
+		return selectColor;
+	}
+
+	public void setSelectColor(boolean selectColor) {
+		this.selectColor = selectColor;
+	}
+	
 
 }
