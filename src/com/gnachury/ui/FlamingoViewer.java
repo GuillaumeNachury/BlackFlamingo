@@ -46,7 +46,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	private float _saturation = .0f;
 	private float _value = .0f;
 	private float _selectedColor = 0.0f;
-	private float _newHue = (float) ((1.0/360.0)*240.0);
+	private float _newHue = (float) ((1.0/360.0)*300.0);
 	
 	
 	
@@ -167,6 +167,8 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 			int uValue = mOffscreenShader.getHandle("uValue");
 			int uSelectedHue = mOffscreenShader.getHandle("uSelectedHue");
 			int uNewHue = mOffscreenShader.getHandle("uNewHue");
+			int uScreenWidth = mOffscreenShader.getHandle("uScreenWidth");
+			int uScreenHeight = mOffscreenShader.getHandle("uScreenHeight");
 			
 			
 			GLES20.glUniformMatrix4fv(uTransformM, 1, false, mTransformM, 0);
@@ -178,6 +180,8 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 			GLES20.glUniform1f(uValue, _value);
 			GLES20.glUniform1f(uSelectedHue, _selectedColor);
 			GLES20.glUniform1f(uNewHue, _newHue);
+			GLES20.glUniform1f(uScreenWidth, (float)glViewPortW);
+			GLES20.glUniform1f(uScreenHeight, (float)glViewPortH);
 			
 			GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 			GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, _oesTex.getTextureId());
