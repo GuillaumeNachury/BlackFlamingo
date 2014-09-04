@@ -1,58 +1,14 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/RelativeLayout1"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:fillViewport="true" 
+    android:id="@+id/RelativeLayoutColor"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#33B5E5" >
 
-        android:background="@android:color/black"
-        android:padding="20dp" >
+    <com.gnachury.library.ColorPicker
+        android:id="@+id/color_picker"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="#FFFFFF" />
 
-        <com.gnachury.library.ColorPicker
-            android:id="@+id/color_picker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <Button
-            android:id="@+id/select_color_button"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/color_picker"
-            android:layout_toRightOf="@+id/color_picker"
-            android:text="@string/label_select_color" />
-
-        <FrameLayout
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_alignLeft="@+id/TextView1"
-            android:layout_below="@+id/TextView1"
-            android:layout_marginLeft="87dp"
-            android:layout_marginTop="46dp" >
-
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:background="@android:color/white"
-                android:gravity="center"
-                android:text="A"
-                android:textSize="42dp"
-                tools:ignore="SpUsage,HardcodedText" />
-
-            <View
-                android:id="@+id/color_square"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:background="@android:color/transparent" />
-        </FrameLayout>
-
-        <TextView
-            android:id="@+id/TextView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/select_color_button"
-            android:layout_alignParentTop="true"
-            android:background="@android:color/white"
-            android:text="@string/label_selected_color"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-    </RelativeLayout>
-
+</FrameLayout>

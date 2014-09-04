@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="buttongap">20dp</dimen>
+    <dimen name="buttongap">10dp</dimen>
     <dimen name="buttonverticalgap">25dp</dimen>
     <!-- Standart dimens for the color wheel -->
     <dimen name="color_wheel_radius">124dp</dimen>

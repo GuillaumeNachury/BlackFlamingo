@@ -6,8 +6,6 @@ import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffColorFilter;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -20,7 +18,7 @@ import android.widget.TextView;
 
 import com.gnachury.blackflamingo.R;
 import com.gnachury.library.ColorPicker;
-import com.gnachury.ui.AdvancedColorPickerFragment;
+import com.gnachury.library.ColorPicker.OnColorChangedListener;
 import com.gnachury.ui.FlamingoViewer;
 /**
  * 
@@ -36,17 +34,18 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 	private float tolValue = 0;
 	private float satValue = 0;
 	private float lumValue = 0;
+	float[] colors;
 	private boolean isActivateSatButton = false;
 	private boolean isActivateLumButton = false;
 	private boolean isActivateTolButton = false;
 	private boolean isActivateOnTouch = false;
+	private boolean isOpenChooseColor = false;
 	private TextView textDebug;
 	private int selectButtonId;
 	private int selectPixelColor;
-	private ColorPicker picker;
-	private AdvancedColorPickerFragment frag;
-	private FragmentManager manager;
-	private FragmentTransaction ft;
+	private int selectColorPickerAngle;
+	private ColorPicker colorPick;
+
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +61,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 		textDebug = (TextView)findViewById(R.id.texttodebug);
 		selectColor = (ImageView)findViewById(R.id.selectColor);
 		chooseColor = (ImageView)findViewById(R.id.colorButton);
+		colorPick = (ColorPicker)findViewById(R.id.color_picker);
+		colorPick.setVisibility(View.INVISIBLE);
 
 		//Add listener 
 		tolButton.setOnClickListener(this);
@@ -70,10 +71,12 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 		selectColor.setOnClickListener(this);
 		chooseColor.setOnClickListener(this);
 		
+		
 		//setOpacity 128 = 50%
 		tolButton.getBackground().setAlpha(128);
 		satButton.getBackground().setAlpha(128);
 		lumButton.getBackground().setAlpha(128);
+		chooseColor.getBackground().setAlpha(128);
 		
 		getWindow().getDecorView().findViewById(android.R.id.content).setOnTouchListener(new OnTouchListener() {
 			
@@ -85,7 +88,20 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 				return true;
 			}
 		});
+		
+		colorPick.setOnColorChangedListener(new OnColorChangedListener() {
+	        @Override
+	        public void onColorChanged(int color) {
+	        	float[] colors = new float[3];
+	    		Color.colorToHSV(color, colors);
+	    		//set the angle value 
+	        	selectColorPickerAngle = (int) colors[0];
+	        	textDebug.setText("color = " +  colors[0]);
+	        }
+	    });
 
+		//Defaut Value : Red
+		colorPick.setColor(Color.argb(255, 255, 0, 0));
 	}
 	
 	//Method touchEvent
@@ -185,6 +201,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 				tolButton.getBackground().setColorFilter(new PorterDuffColorFilter(Color.GREEN,Mode.SRC_ATOP));
 				lumButton.getBackground().clearColorFilter();
 				satButton.getBackground().clearColorFilter();
+			//	chooseColor.getBackground().clearColorFilter();
 			}
 			else{
 				isActivateOnTouch = false;
@@ -203,6 +220,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 				tolButton.getBackground().clearColorFilter();
 				lumButton.getBackground().setColorFilter(new PorterDuffColorFilter(Color.GREEN,Mode.SRC_ATOP));
 				satButton.getBackground().clearColorFilter();
+			//	chooseColor.getBackground().clearColorFilter();
 			}
 			else{
 				isActivateOnTouch = false;
@@ -219,6 +237,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 				isActivateLumButton = false;
 				tolButton.getBackground().clearColorFilter();
 				lumButton.getBackground().clearColorFilter();
+			//	chooseColor.getBackground().clearColorFilter();
 				satButton.getBackground().setColorFilter(new PorterDuffColorFilter(Color.GREEN,Mode.SRC_ATOP));
 			}
 			else{
@@ -230,21 +249,31 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 			
 		case R.id.selectColor:
 			resetAllColorButton();
-			selectPixelColor = -2162433;
+			//Purple
+			colorPick.setOldCenterColor(Color.argb(255,128,0,128));
 			break;
 			
 		case R.id.colorButton:
-			resetAllColorButton();
-			//showColorPickerDialog();
-			//ToDo open circle color 
-			Bundle args = new Bundle();		
-			args.putInt("color", selectPixelColor);
-			FragmentManager manager = this.getSupportFragmentManager();
-			FragmentTransaction ft = manager.beginTransaction();
-			frag = new AdvancedColorPickerFragment();
-			frag.setArguments(args);
-			ft.add(R.id.RelativeLayout1, frag, "colorpicker").addToBackStack(null).commit();
+			if(!isOpenChooseColor){
+				isOpenChooseColor = true;
+				isActivateOnTouch = true;
+				isActivateSatButton = true;
+				isActivateTolButton = false;
+				isActivateLumButton = false;
+				tolButton.getBackground().clearColorFilter();
+				lumButton.getBackground().clearColorFilter();
+				satButton.getBackground().clearColorFilter();
+				chooseColor.getBackground().setColorFilter(new PorterDuffColorFilter(Color.GREEN,Mode.SRC_ATOP));
+				colorPick.setVisibility(View.VISIBLE);
+			}
+			else{
+				isActivateOnTouch = false;
+				isOpenChooseColor = false;
+				chooseColor.getBackground().clearColorFilter();
+				colorPick.setVisibility(View.INVISIBLE);
+			}
 			break;
+
 
 		default:
 			break;
@@ -257,9 +286,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 		isActivateSatButton = false;
 		isActivateTolButton = false;
 		isActivateLumButton = false;
+		isOpenChooseColor = false;
 		tolButton.getBackground().clearColorFilter();
 		lumButton.getBackground().clearColorFilter();
 		satButton.getBackground().clearColorFilter();	
+		//chooseColor.getBackground().clearColorFilter();	
 	}
 	
 	//Color picker in AlertDialog
@@ -300,6 +331,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 	}
 	*/
 	
+	
+	
 
 	public FlamingoViewer getFv() {
 		return fv;
@@ -309,17 +342,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 		this.fv = fv;
 	}
 	
-	 @Override
-	 public void onBackPressed() {
-		 int count = getFragmentManager().getBackStackEntryCount();
-		 
-		    if (count == 0) {
-		        super.onBackPressed();
-		    } else {
-				ft = manager.beginTransaction();
-				ft.remove(getSupportFragmentManager().findFragmentByTag("colorpicker")).commit();
-		    }
-	     
-	 }
+	
 
 }

@@ -4,11 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
+
+    
     <com.gnachury.ui.FlamingoViewer
         android:id="@+id/renderer_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
+        android:layout_height="match_parent"
+       />
+    
     <TextView
         android:id="@+id/texttodebug"
         android:layout_width="wrap_content"
@@ -19,52 +22,56 @@
         android:text="Black Flamingo" />
 
     <ImageView
-        android:id="@+id/selectColor"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"      
-        android:layout_centerHorizontal="true"
-        android:layout_centerInParent="true"
-        android:layout_centerVertical="true"
-        android:background="@drawable/select" />
-
-    <ImageView
-        android:id="@+id/colorButton"
+        android:id="@+id/tolerance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:background="@drawable/color"
-        android:layout_marginTop="@dimen/buttonverticalgap"
-        android:layout_marginRight="@dimen/buttonverticalgap" />
-
-    <ImageView
-        android:id="@+id/luminance"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/colorButton"
-        android:background="@drawable/v" 
-        android:layout_marginTop="@dimen/buttonverticalgap"
-        android:layout_marginRight="@dimen/buttonverticalgap"/>
+        android:layout_alignLeft="@+id/luminance"
+        android:layout_below="@+id/luminance"
+        android:background="@drawable/tolerance" 
+        android:layout_marginBottom="@dimen/buttongap"/>
 
     <ImageView
         android:id="@+id/saturation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
+        android:layout_alignLeft="@+id/tolerance"
         android:layout_below="@+id/tolerance"
-        android:background="@drawable/s" 
-        android:layout_marginTop="@dimen/buttonverticalgap"
-        android:layout_marginRight="@dimen/buttonverticalgap"/>
+        android:background="@drawable/s" />
 
     <ImageView
-        android:id="@+id/tolerance"
+        android:id="@+id/luminance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/colorButton"
+        android:layout_centerVertical="true"
+        android:background="@drawable/v"
+        android:layout_marginBottom="@dimen/buttongap" />
+
+    <ImageView
+        android:id="@+id/colorButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/luminance"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/luminance"
-        android:background="@drawable/tolerance" 
-        android:layout_marginTop="@dimen/buttonverticalgap"
-        android:layout_marginRight="@dimen/buttonverticalgap"/>
+        android:layout_marginRight="28dp"
+        android:background="@drawable/color"
+        android:layout_marginBottom="@dimen/buttongap" />
+
+    <ImageView
+        android:id="@+id/selectColor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/colorButton"
+        android:layout_alignLeft="@+id/colorButton"
+        android:background="@drawable/select" 
+        android:layout_marginBottom="@dimen/buttongap"/>
+
+        <com.gnachury.library.ColorPicker
+            android:id="@+id/color_picker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:background="@android:color/transparent" />
 
 </RelativeLayout>

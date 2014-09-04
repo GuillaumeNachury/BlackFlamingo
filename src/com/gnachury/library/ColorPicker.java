@@ -16,8 +16,6 @@
 
 package com.gnachury.library;
 
-import com.gnachury.blackflamingo.R;
-
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -32,6 +30,8 @@ import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+
+import com.gnachury.blackflamingo.R;
 
 /**
  * Displays a holo-themed color picker.
@@ -578,7 +578,7 @@ public class ColorPicker extends View {
 	 * @return The angle (in rad) the "normalized" color is displayed on the
 	 *         color wheel.
 	 */
-	private float colorToAngle(int color) {
+	public float colorToAngle(int color) {
 		float[] colors = new float[3];
 		Color.colorToHSV(color, colors);
 		
