@@ -1,18 +1,11 @@
 package com.gnachury.ui;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import com.gnachury.ShaderParam;
-import com.gnachury.blackflamingo.R;
-import com.gnachury.util.OESTexture;
-import com.gnachury.util.Shader;
-
-import android.R.bool;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.SurfaceTexture;
@@ -22,9 +15,11 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.MotionEvent;
-import android.widget.TextView;
+
+import com.gnachury.ShaderParam;
+import com.gnachury.blackflamingo.R;
+import com.gnachury.util.OESTexture;
+import com.gnachury.util.Shader;
 
 public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvailableListener{
 
