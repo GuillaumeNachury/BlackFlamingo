@@ -1,5 +1,8 @@
 <resources>
 
     <string name="app_name">BlackFlamingo</string>
+    <string name="label_text_color">Text color</string>
+    <string name="label_selected_color">Currently selected color:</string>
+    <string name="label_select_color">Select color</string>
 
 </resources>

@@ -1,11 +1,13 @@
 package com.gnachury;
 
-import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffColorFilter;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -13,18 +15,19 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gnachury.blackflamingo.R;
+import com.gnachury.ui.AdvancedColorPickerFragment;
 import com.gnachury.ui.FlamingoViewer;
+import com.larswerkman.holocolorpicker.ColorPicker;
 /**
  * 
  * @author Guillaume
  *
  */
-public class MainActivity extends Activity implements OnClickListener{
+public class MainActivity extends FragmentActivity implements OnClickListener{
 
 	private final static String tag = "MainActivity";
 	private FlamingoViewer fv;
@@ -39,6 +42,11 @@ public class MainActivity extends Activity implements OnClickListener{
 	private boolean isActivateOnTouch = false;
 	private TextView textDebug;
 	private int selectButtonId;
+	private int selectPixelColor;
+	private ColorPicker picker;
+	private AdvancedColorPickerFragment frag;
+	private FragmentManager manager;
+	private FragmentTransaction ft;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -219,13 +227,20 @@ public class MainActivity extends Activity implements OnClickListener{
 			
 		case R.id.selectColor:
 			resetAllColorButton();
-			//ToDo catch the pixel 
+			selectPixelColor = -2162433;
 			break;
 			
 		case R.id.colorButton:
 			resetAllColorButton();
-			
+			//showColorPickerDialog();
 			//ToDo open circle color 
+			Bundle args = new Bundle();		
+			args.putInt("color", selectPixelColor);
+			FragmentManager manager = this.getSupportFragmentManager();
+			FragmentTransaction ft = manager.beginTransaction();
+			frag = new AdvancedColorPickerFragment();
+			frag.setArguments(args);
+			ft.add(R.id.RelativeLayout1, frag, "colorpicker").addToBackStack(null).commit();
 			break;
 
 		default:
@@ -243,6 +258,45 @@ public class MainActivity extends Activity implements OnClickListener{
 		lumButton.getBackground().clearColorFilter();
 		satButton.getBackground().clearColorFilter();	
 	}
+	
+	//Color picker in AlertDialog
+	/*private void showColorPickerDialog()
+	{
+	    AlertDialog.Builder colorDialogBuilder = new AlertDialog.Builder(MainActivity.this);
+	    LayoutInflater inflater = LayoutInflater.from(this);
+	    View dialogview = inflater.inflate(R.layout.dialog_color, null);
+	    picker = (ColorPicker) dialogview.findViewById(R.id.picker);
+	    picker.setOldCenterColor(selectPixelColor);
+	    picker.setOnColorChangedListener(new ColorPicker.OnColorChangedListener()
+	    {
+	        @Override
+	        public void onColorChanged(int color) {
+	        	
+	        }
+	    });
+	    colorDialogBuilder.setTitle("Choose Text Color");
+	    colorDialogBuilder.setView(dialogview);
+	    colorDialogBuilder.setPositiveButton("OK",
+	    new DialogInterface.OnClickListener() {
+	        @Override
+	        public void onClick(DialogInterface dialog, int which) {
+	            Log.d(tag, "Color :" + picker.getColor());
+	          //  colorPickerView.setTextColor(picker.getColor());
+	           // picker.getOldCenterColor();
+	        }
+	    });
+	    colorDialogBuilder.setNegativeButton("Cancel",
+	            new DialogInterface.OnClickListener() {
+	        @Override
+	        public void onClick(DialogInterface dialog, int which) {
+	            dialog.cancel();
+	        }
+	    });
+	    AlertDialog colorPickerDialog = colorDialogBuilder.create();
+	    colorPickerDialog.show();
+	}
+	*/
+	
 
 	public FlamingoViewer getFv() {
 		return fv;
@@ -251,4 +305,18 @@ public class MainActivity extends Activity implements OnClickListener{
 	public void setFv(FlamingoViewer fv) {
 		this.fv = fv;
 	}
+	
+	 @Override
+	 public void onBackPressed() {
+		 int count = getFragmentManager().getBackStackEntryCount();
+		 
+		    if (count == 0) {
+		        super.onBackPressed();
+		    } else {
+				ft = manager.beginTransaction();
+				ft.remove(getSupportFragmentManager().findFragmentByTag("colorpicker")).commit();
+		    }
+	     
+	 }
+
 }
