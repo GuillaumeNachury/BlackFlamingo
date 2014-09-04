@@ -3,6 +3,7 @@
 	<name>BlackFlamingo</name>
 	<comment></comment>
 	<projects>
+		<project>HoloColorPicker-master</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
