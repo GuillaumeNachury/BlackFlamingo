@@ -19,9 +19,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gnachury.blackflamingo.R;
+import com.gnachury.library.ColorPicker;
 import com.gnachury.ui.AdvancedColorPickerFragment;
 import com.gnachury.ui.FlamingoViewer;
-import com.larswerkman.holocolorpicker.ColorPicker;
 /**
  * 
  * @author Guillaume

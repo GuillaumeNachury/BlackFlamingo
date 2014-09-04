@@ -10,8 +10,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.gnachury.blackflamingo.R;
-import com.larswerkman.holocolorpicker.ColorPicker;
-import com.larswerkman.holocolorpicker.ColorPicker.OnColorChangedListener;
+import com.gnachury.library.ColorPicker;
+import com.gnachury.library.ColorPicker.OnColorChangedListener;
 
 public class AdvancedColorPickerFragment extends Fragment {
 
