@@ -12,7 +12,6 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.SurfaceTexture;
@@ -36,7 +35,6 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	private Quad _quad;
 	private Camera _camera;
 	private boolean selectColor = false;
-	private int frameId = 0;
 
 	private final Shader mOffscreenShader = new Shader();
 	private float[] mTransformM = new float[16];
@@ -159,13 +157,9 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 
 	@Override
 	public synchronized void onDrawFrame(GL10 gl) {
-		if(frameId == 1){
-			frameId = 0;
-			SavePNG(glViewPortW/2,glViewPortH/2,10,10,"Shader_"+Math.random()+".jpg",gl);
-		}
 		if(selectColor){
-			selectColor = false;
-			frameId = 1;
+			SavePNG(glViewPortW/2,glViewPortH/2,10,10,"Shader_"+Math.random()+".png",gl);
+			
 		}
 		GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
@@ -189,7 +183,6 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 			int uNewHue = mOffscreenShader.getHandle("uNewHue");
 			int uScreenWidth = mOffscreenShader.getHandle("uScreenWidth");
 			int uScreenHeight = mOffscreenShader.getHandle("uScreenHeight");
-			int uFrameId = mOffscreenShader.getHandle("uFrameId");
 			
 			
 			GLES20.glUniformMatrix4fv(uTransformM, 1, false, mTransformM, 0);
@@ -203,8 +196,6 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 			GLES20.glUniform1f(uNewHue, _newHue);
 			GLES20.glUniform1f(uScreenWidth, (float)glViewPortW);
 			GLES20.glUniform1f(uScreenHeight, (float)glViewPortH);
-			
-			GLES20.glUniform1i(uFrameId, frameId);
 			
 			GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 			GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, _oesTex.getTextureId());
@@ -301,17 +292,17 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 
 	public  void SavePNG(int x, int y, int w, int h, String name, GL10 gl)
 	{
-		selectColor = false;
+	
 	    Bitmap bmp=SavePixels(x,y,w,h,gl);
 	    try
 	    {
 	    	File rootmedia = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "BlackFlamingo");
-	    	Log.e("FlamingoV",rootmedia.getPath());
+	    	Log.e("FlamingoV",rootmedia.getPath()+ File.separator + name);
 	    	if (!rootmedia.exists()) {
 				rootmedia.mkdirs() ;
 
 			}
-	    	FileOutputStream fos=new FileOutputStream(rootmedia.getPath()+ File.separator + name);
+	    	FileOutputStream fos=new FileOutputStream(rootmedia.getPath()+ File.separator + "/"+ name);
 	        bmp.compress(CompressFormat.PNG, 100, fos);
 	        try
 	        {
@@ -331,6 +322,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	            // TODO Auto-generated catch block
 	            e.printStackTrace();
 	        }
+	        selectColor = false;
 	    }
 	    catch (FileNotFoundException e)
 	    {
@@ -338,7 +330,6 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	        e.printStackTrace();
 	    }              
 	}
-	
 	
 	
 	public boolean isSelectColor() {
