@@ -65,6 +65,15 @@
         android:layout_alignLeft="@+id/colorButton"
         android:background="@drawable/select" 
         android:layout_marginBottom="@dimen/buttongap"/>
+    
+    <ImageView
+        android:id="@+id/crosshair"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        android:background="@drawable/crosshair" 
+        android:layout_marginBottom="@dimen/buttongap"/>
 
         <com.gnachury.library.ColorPicker
             android:id="@+id/color_picker"

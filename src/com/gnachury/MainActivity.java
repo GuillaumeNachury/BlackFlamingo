@@ -29,7 +29,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 
 	private final static String tag = "MainActivity";
 	private FlamingoViewer fv;
-	private ImageView tolButton, satButton, lumButton, selectColor, chooseColor;
+	private ImageView tolButton, satButton, lumButton, selectColor, chooseColor, crosshair;
 	private float screenHeight;
 	private float tolValue = 0;
 	private float satValue = 0;
@@ -63,6 +63,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 		chooseColor = (ImageView)findViewById(R.id.colorButton);
 		colorPick = (ColorPicker)findViewById(R.id.color_picker);
 		colorPick.setVisibility(View.INVISIBLE);
+		crosshair = (ImageView)findViewById(R.id.crosshair);
 
 		//Add listener 
 		tolButton.setOnClickListener(this);
