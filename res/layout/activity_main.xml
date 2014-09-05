@@ -2,9 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/RelativeLayout1"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-
-
+    android:layout_height="match_parent"
+    android:layout_gravity="center" >
     
     <com.gnachury.ui.FlamingoViewer
         android:id="@+id/renderer_view"
@@ -16,10 +15,11 @@
         android:id="@+id/texttodebug"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:textColor="@android:color/white"
-        android:text="Black Flamingo" />
+        android:layout_marginBottom="@dimen/buttongap"
+        android:layout_marginTop="@dimen/buttongap"
+        android:text="Black Flamingo"
+        android:textColor="@android:color/white" />
 
     <ImageView
         android:id="@+id/tolerance"
@@ -70,8 +70,8 @@
             android:id="@+id/color_picker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
             android:background="@android:color/transparent" />
 
 </RelativeLayout>
