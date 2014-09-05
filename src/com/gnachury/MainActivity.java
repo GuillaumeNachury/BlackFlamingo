@@ -139,7 +139,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 	    			case MotionEvent.ACTION_DOWN:
 	    				actionString = "DOWN";
 	    				fv.setEventMotion(actionString);	
-	    				
 	    				fv.setSelectColor(true);
 	    				break;
 	    			case MotionEvent.ACTION_UP:

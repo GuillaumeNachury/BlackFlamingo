@@ -279,9 +279,11 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
         int pb=(pix>>16)&0xff;
         int pr=(pix<<16)&0x00ff0000;
         int pix1=(pix&0xff00ff00) | pr | pb;
-       
-        
-        
+        float[] colors = new float[3];
+		Color.colorToHSV(pix1, colors);
+		_selectedColor = (float) colors[0];
+		 Log.e("Flaming","color = " + pix1 + "_selectedColor = " + _selectedColor );
+		
 		
 		return pix1;
 	}
