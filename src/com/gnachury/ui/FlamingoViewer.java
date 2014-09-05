@@ -62,7 +62,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	private float _tolerance = 10.0f;
 	private float _saturation = .0f;
 	private float _value = .0f;
-	private float _selectedColor = 0.0f;
+	private float _selectedColor = 120.0f;
 	private float _newHue = (float) ((1.0/360.0)*300.0);
 	
 
