@@ -251,8 +251,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 			
 		case R.id.selectColor:
 			resetAllColorButton();
-			//Purple
-			colorPick.setOldCenterColor(Color.argb(255,128,0,128));
+			fv.setSelectColor(true);
 			break;
 			
 		case R.id.colorButton:
@@ -291,47 +290,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 		isOpenChooseColor = false;
 		tolButton.getBackground().clearColorFilter();
 		lumButton.getBackground().clearColorFilter();
-		satButton.getBackground().clearColorFilter();	
-		//chooseColor.getBackground().clearColorFilter();	
+		satButton.getBackground().clearColorFilter();		
 	}
-	
-	//Color picker in AlertDialog
-	/*private void showColorPickerDialog()
-	{
-	    AlertDialog.Builder colorDialogBuilder = new AlertDialog.Builder(MainActivity.this);
-	    LayoutInflater inflater = LayoutInflater.from(this);
-	    View dialogview = inflater.inflate(R.layout.dialog_color, null);
-	    picker = (ColorPicker) dialogview.findViewById(R.id.picker);
-	    picker.setOldCenterColor(selectPixelColor);
-	    picker.setOnColorChangedListener(new ColorPicker.OnColorChangedListener()
-	    {
-	        @Override
-	        public void onColorChanged(int color) {
-	        	
-	        }
-	    });
-	    colorDialogBuilder.setTitle("Choose Text Color");
-	    colorDialogBuilder.setView(dialogview);
-	    colorDialogBuilder.setPositiveButton("OK",
-	    new DialogInterface.OnClickListener() {
-	        @Override
-	        public void onClick(DialogInterface dialog, int which) {
-	            Log.d(tag, "Color :" + picker.getColor());
-	          //  colorPickerView.setTextColor(picker.getColor());
-	           // picker.getOldCenterColor();
-	        }
-	    });
-	    colorDialogBuilder.setNegativeButton("Cancel",
-	            new DialogInterface.OnClickListener() {
-	        @Override
-	        public void onClick(DialogInterface dialog, int which) {
-	            dialog.cancel();
-	        }
-	    });
-	    AlertDialog colorPickerDialog = colorDialogBuilder.create();
-	    colorPickerDialog.show();
-	}
-	*/
 	
 	
 	
