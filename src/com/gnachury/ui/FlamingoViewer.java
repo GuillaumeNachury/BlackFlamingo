@@ -151,6 +151,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 			mRatio[0] = _cameraW*1.0f/width;
 		}
 		
+		param.setFocusMode("continuous-picture");
 		
 		_camera.setParameters(param);	
 		
