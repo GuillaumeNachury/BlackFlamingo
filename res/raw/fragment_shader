@@ -49,7 +49,7 @@ void trnTorgb(inout vec3 c)
 void pixelTest(inout vec3 col)
 {
 	float step = (1.0/360.0);
-	float y = step*120.0;
+	float y = step*uSelectedHue;
 	
 	float tol = step*uHueTolerance;
 	

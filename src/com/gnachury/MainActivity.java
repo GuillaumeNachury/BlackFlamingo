@@ -203,6 +203,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 
 	@Override
 	public void onClick(View v) { 
+		crosshair.setVisibility(View.INVISIBLE);
 		//Select a button to apply its color,  and disable the others
 		isActivateOnTouch = true;
 		selectButtonId = v.getId();
@@ -276,6 +277,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 			colorPick.setVisibility(View.INVISIBLE);
 			isOpenChooseColor = false;
 			if(fv.getModeSelectReelColor() == 0){
+				crosshair.setVisibility(View.VISIBLE);
 				fv.setModeSelectReelColor(1);
 				selectColor.getBackground().setColorFilter(new PorterDuffColorFilter(Color.GREEN,Mode.SRC_ATOP));
 			}
