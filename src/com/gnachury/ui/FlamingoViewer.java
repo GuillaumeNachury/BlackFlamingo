@@ -18,6 +18,7 @@ import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.opengl.GLES20;
+import android.opengl.GLException;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.os.Environment;
@@ -33,7 +34,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 
 	private Quad _quad;
 	private Camera _camera;
-	private boolean selectColor;
+	private boolean selectColor = false;
 
 	private final Shader mOffscreenShader = new Shader();
 	private float[] mTransformM = new float[16];
@@ -156,14 +157,13 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 
 	@Override
 	public synchronized void onDrawFrame(GL10 gl) {
+		if(selectColor){
+			SavePNG(glViewPortW/2,glViewPortH/2,10,10,"Shader_"+Math.random()+".jpg",gl);
+			
+		}
 		GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-		
-		if(selectColor){
-			SavePNG(glViewPortW/2,glViewPortH/2,10,10,"Shader.jpg",gl);
-		}
-	
-		
+
 		if(_isDirty){
 			_isDirty = false;
 			_currentTex.updateTexImage();
@@ -290,13 +290,19 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	    return sb;
 	}
 
-	public static void SavePNG(int x, int y, int w, int h, String name, GL10 gl)
+	public  void SavePNG(int x, int y, int w, int h, String name, GL10 gl)
 	{
+		selectColor = false;
 	    Bitmap bmp=SavePixels(x,y,w,h,gl);
 	    try
 	    {
-	        FileOutputStream fos=new FileOutputStream(Environment.getExternalStorageDirectory()
-                    + File.separator + name);
+	    	File rootmedia = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "BlackFlamingo");
+	    	Log.e("FlamingoV",rootmedia.getPath());
+	    	if (!rootmedia.exists()) {
+				rootmedia.mkdirs() ;
+
+			}
+	    	FileOutputStream fos=new FileOutputStream(rootmedia.getPath()+ File.separator + name);
 	        bmp.compress(CompressFormat.PNG, 100, fos);
 	        try
 	        {
@@ -324,6 +330,34 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	    }              
 	}
 	
+	private Bitmap createBitmapFromGLSurface(int x, int y, int w, int h, GL10 gl)
+	        throws OutOfMemoryError {
+	    int bitmapBuffer[] = new int[w * h];
+	    int bitmapSource[] = new int[w * h];
+	    IntBuffer intBuffer = IntBuffer.wrap(bitmapBuffer);
+	    intBuffer.position(0);
+
+	    try {
+	        gl.glReadPixels(x, y, w, h, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, intBuffer);
+	        int offset1, offset2;
+	        for (int i = 0; i < h; i++) {
+	            offset1 = i * w;
+	            offset2 = (h - i - 1) * w;
+	            for (int j = 0; j < w; j++) {
+	                int texturePixel = bitmapBuffer[offset1 + j];
+	                int blue = (texturePixel >> 16) & 0xff;
+	                int red = (texturePixel << 16) & 0x00ff0000;
+	                int pixel = (texturePixel & 0xff00ff00) | red | blue;
+	                bitmapSource[offset2 + j] = pixel;
+	            }
+	        }
+	    } catch (GLException e) {
+	        return null;
+	    }
+
+	    return Bitmap.createBitmap(bitmapSource, w, h, Bitmap.Config.ARGB_8888);
+	}
+	
 	public boolean isSelectColor() {
 		return selectColor;
 	}
@@ -331,6 +365,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	public void setSelectColor(boolean selectColor) {
 		this.selectColor = selectColor;
 	}
+	
 	
 
 }
