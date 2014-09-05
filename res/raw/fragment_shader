@@ -68,7 +68,7 @@ void main(){
 	vec2 p = vTextureCoord;
 	
 	//DEBUG
-	float limit = (1.0-p.y);
+	float limit = 1.1;//(1.0-p.y);
 	
 	
 	vec3 col = texture2D(sTexture, vTextureCoord).rgb;

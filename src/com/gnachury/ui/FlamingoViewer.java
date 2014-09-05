@@ -59,6 +59,9 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	private float _selectedColor = 0.0f;
 	private float _newHue = (float) ((1.0/360.0)*300.0);
 	
+	/* **** TEST **** */
+	private long cptr = 0;
+	
 	
 	
 
@@ -158,11 +161,17 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 
 	@Override
 	public synchronized void onDrawFrame(GL10 gl) {
-		if(frameId == 1){
+		cptr++;
+		if(frameId == 1){	
+			Log.e("Frame counter","id ="+cptr );
+			SavePNG(glViewPortW/2,glViewPortH/2,10,10,"Shader_"+Math.random()+".png",gl);
 			frameId = 0;
 		}
 		if(selectColor){
-			SavePNG(glViewPortW/2,glViewPortH/2,10,10,"Shader_"+Math.random()+".png",gl);
+			cptr = 0;
+			Log.e("Frame counter","id ="+cptr );
+			_isDirty = true;
+			selectColor = false;
 			frameId = 1;
 		}
 		GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -328,7 +337,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	            // TODO Auto-generated catch block
 	            e.printStackTrace();
 	        }
-	        selectColor = false;
+	        
 	    }
 	    catch (FileNotFoundException e)
 	    {
