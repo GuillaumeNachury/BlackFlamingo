@@ -35,6 +35,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	private Quad _quad;
 	private Camera _camera;
 	private boolean selectColor = false;
+	private int frameId = 0;
 
 	private final Shader mOffscreenShader = new Shader();
 	private float[] mTransformM = new float[16];
@@ -157,9 +158,12 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 
 	@Override
 	public synchronized void onDrawFrame(GL10 gl) {
+		if(frameId == 1){
+			frameId = 0;
+		}
 		if(selectColor){
 			SavePNG(glViewPortW/2,glViewPortH/2,10,10,"Shader_"+Math.random()+".png",gl);
-			
+			frameId = 1;
 		}
 		GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
@@ -172,7 +176,6 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 			GLES20.glViewport(0,0, glViewPortW, glViewPortH);
 			
 			mOffscreenShader.useProgram();
-			
 			int uTransformM = mOffscreenShader.getHandle("uTransformM");
 			int uOrientationM = mOffscreenShader.getHandle("uOrientationM");
 			int uRatioV = mOffscreenShader.getHandle("ratios");
@@ -183,6 +186,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 			int uNewHue = mOffscreenShader.getHandle("uNewHue");
 			int uScreenWidth = mOffscreenShader.getHandle("uScreenWidth");
 			int uScreenHeight = mOffscreenShader.getHandle("uScreenHeight");
+			int uFrameId = mOffscreenShader.getHandle("uFrameId");
 			
 			
 			GLES20.glUniformMatrix4fv(uTransformM, 1, false, mTransformM, 0);
@@ -196,6 +200,8 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 			GLES20.glUniform1f(uNewHue, _newHue);
 			GLES20.glUniform1f(uScreenWidth, (float)glViewPortW);
 			GLES20.glUniform1f(uScreenHeight, (float)glViewPortH);
+			
+			GLES20.glUniform1i(uFrameId, frameId);
 			
 			GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 			GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, _oesTex.getTextureId());
