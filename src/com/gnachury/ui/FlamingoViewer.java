@@ -13,6 +13,7 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
@@ -25,6 +26,7 @@ import android.os.Environment;
 import android.util.AttributeSet;
 import android.util.Log;
 
+import com.gnachury.MainActivity;
 import com.gnachury.ShaderParam;
 import com.gnachury.blackflamingo.R;
 import com.gnachury.util.OESTexture;
@@ -36,6 +38,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	private Camera _camera;
 	private boolean selectColor = false;
 	private int frameId = 0;
+	private String eventMotion = "";
 
 	private final Shader mOffscreenShader = new Shader();
 	private float[] mTransformM = new float[16];
@@ -51,6 +54,9 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	private int _cameraW;
 	private int _cameraH;
 	private Context _context;
+	private int pixelColor;
+	
+	private int modeSelectReelColor;
 	
 	/* ******* Shader variables ******* */
 	private float _tolerance = 10.0f;
@@ -59,11 +65,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	private float _selectedColor = 0.0f;
 	private float _newHue = (float) ((1.0/360.0)*300.0);
 	
-	/* **** TEST **** */
-	private long cptr = 0;
-	
-	
-	
+
 
 	public FlamingoViewer(Context context) {
 		super(context);
@@ -161,19 +163,22 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 
 	@Override
 	public synchronized void onDrawFrame(GL10 gl) {
-		cptr++;
-		if(frameId == 1){	
-			Log.e("Frame counter","id ="+cptr );
-			SavePNG(glViewPortW/2,glViewPortH/2,10,10,"Shader_"+Math.random()+".png",gl);
-			frameId = 0;
-		}
-		if(selectColor){
-			cptr = 0;
-			Log.e("Frame counter","id ="+cptr );
-			_isDirty = true;
-			selectColor = false;
+
+		if(modeSelectReelColor == 1){
+			//getPixel(gl);
+			//SavePNG(glViewPortW/2,glViewPortH/2,10,10,"Shader_"+Math.random()+".png",gl);
 			frameId = 1;
 		}
+		else{
+			frameId = 0;
+		}
+		if(selectColor && modeSelectReelColor == 1){
+			//SavePNG(glViewPortW/2,glViewPortH/2,10,10,"Shader_"+Math.random()+".png",gl);
+			pixelColor = getPixel(gl);					
+			Log.e("Flamino", "pixel = " + pixelColor);
+			selectColor = false;
+		}
+
 		GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
@@ -195,8 +200,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 			int uNewHue = mOffscreenShader.getHandle("uNewHue");
 			int uScreenWidth = mOffscreenShader.getHandle("uScreenWidth");
 			int uScreenHeight = mOffscreenShader.getHandle("uScreenHeight");
-			int uFrameId = mOffscreenShader.getHandle("uFrameId");
-			
+			int uFrameId = mOffscreenShader.getHandle("uFrameId");			
 			
 			GLES20.glUniformMatrix4fv(uTransformM, 1, false, mTransformM, 0);
 			GLES20.glUniformMatrix4fv(uOrientationM, 1, false, mOrientationM, 0);
@@ -211,7 +215,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 			GLES20.glUniform1f(uScreenHeight, (float)glViewPortH);
 			
 			GLES20.glUniform1i(uFrameId, frameId);
-			
+		
 			GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 			GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, _oesTex.getTextureId());
 			
@@ -266,7 +270,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 		
 	}
 	
-	public void getPixel(GL10 gl){
+	public int getPixel(GL10 gl){
 		int b[] = new int [1];
 		IntBuffer ib=IntBuffer.wrap(b);
 	    ib.position(0);
@@ -275,8 +279,11 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
         int pb=(pix>>16)&0xff;
         int pr=(pix<<16)&0x00ff0000;
         int pix1=(pix&0xff00ff00) | pr | pb;
-		Log.e("Flaming","color = " + pix1  );
-		selectColor = false;
+       
+        
+        
+		
+		return pix1;
 	}
 	
 	public static Bitmap SavePixels(int x, int y, int w, int h, GL10 gl)
@@ -294,11 +301,16 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	    {         
 	        for(int j=0; j<w; j++)
 	        {
-	            int pix=b[i*w+j];
+	            int pix=b[0];
 	            int pb=(pix>>16)&0xff;
 	            int pr=(pix<<16)&0x00ff0000;
 	            int pix1=(pix&0xff00ff00) | pr | pb;
 	            bt[(h-i-1)*w+j]=pix1;
+	            float[] colors = new float[3];
+	    		Color.colorToHSV(pix1, colors);
+	    		//set the angle value 
+	        	int selectColorPickerAngle = (int) colors[0];
+	            Log.e("Flaming","color = " + pix1 + "__selectColorPickerAngle = " + selectColorPickerAngle );
 	        }
 	    }              
 	    Bitmap sb= Bitmap.createBitmap(bt, w, h, Bitmap.Config.ARGB_8888);
@@ -337,7 +349,6 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	            // TODO Auto-generated catch block
 	            e.printStackTrace();
 	        }
-	        
 	    }
 	    catch (FileNotFoundException e)
 	    {
@@ -354,7 +365,29 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	public void setSelectColor(boolean selectColor) {
 		this.selectColor = selectColor;
 	}
-	
-	
+
+	public int getModeSelectReelColor() {
+		return modeSelectReelColor;
+	}
+
+	public void setModeSelectReelColor(int modeSelectReelColor) {
+		this.modeSelectReelColor = modeSelectReelColor;
+	}
+
+	public String getEventMotion() {
+		return eventMotion;
+	}
+
+	public void setEventMotion(String eventMotion) {
+		this.eventMotion = eventMotion;
+	}
+
+	public int getPixelColor() {
+		return pixelColor;
+	}
+
+	public void setPixelColor(int pixelColor) {
+		this.pixelColor = pixelColor;
+	}
 
 }

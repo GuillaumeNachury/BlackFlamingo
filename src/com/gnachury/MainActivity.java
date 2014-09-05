@@ -71,12 +71,16 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 		selectColor.setOnClickListener(this);
 		chooseColor.setOnClickListener(this);
 		
-		
+		//initial mode select
+		selectColor.getBackground().setColorFilter(new PorterDuffColorFilter(Color.GREEN,Mode.SRC_ATOP));
+		fv.setModeSelectReelColor(1);
+		fv.setSelectColor(true);
 		//setOpacity 128 = 50%
 		tolButton.getBackground().setAlpha(128);
 		satButton.getBackground().setAlpha(128);
 		lumButton.getBackground().setAlpha(128);
 		chooseColor.getBackground().setAlpha(128);
+		selectColor.getBackground().setAlpha(128);
 		
 		getWindow().getDecorView().findViewById(android.R.id.content).setOnTouchListener(new OnTouchListener() {
 			
@@ -101,7 +105,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 	        	fv.updateShaderParameter(ShaderParam.NEW_HUE, (float)((1.0/360.0)*selectColorPickerAngle));
 	        }
 	    });
-
+		colorPick.setShowOldCenterColor(true);
+		
+		colorPick.setOldCenterColor(fv.getPixelColor());
 		//Defaut Value : Red
 		colorPick.setColor(Color.argb(255, 255, 0, 0));
 	}
@@ -109,6 +115,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 	//Method touchEvent
 	public void handleTouch(MotionEvent m)
 	{
+		Log.e("Flamino", "pixel = " + fv.getPixelColor());
+		
 	    	int pointerCount = m.getPointerCount();
 	    	//Screen dimensions
 	    	Display display = getWindowManager().getDefaultDisplay(); 
@@ -129,9 +137,14 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 	    			//some exemple of action event
 	    			case MotionEvent.ACTION_DOWN:
 	    				actionString = "DOWN";
+	    				fv.setEventMotion(actionString);	
+	    				
+	    				fv.setSelectColor(true);
 	    				break;
 	    			case MotionEvent.ACTION_UP:
 	    				actionString = "UP";
+	    				//fv.setEventMotion(actionString);
+	    				fv.setSelectColor(false);
 	    				break;	
 	    			case MotionEvent.ACTION_POINTER_DOWN:
 	    				actionString = "PNTR DOWN";
@@ -195,6 +208,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 		selectButtonId = v.getId();
 		switch (v.getId()) {
 		case R.id.tolerance:
+			fv.setModeSelectReelColor(0);
+			selectColor.getBackground().clearColorFilter();
+			
 			if(!isActivateTolButton){
 				isActivateOnTouch = true;
 				isActivateTolButton = true;
@@ -210,10 +226,12 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 				isActivateTolButton = false;
 				tolButton.getBackground().clearColorFilter();
 			}
-			
+			//fv.setModeSelectReelColor(0);
 			break;
 			
 		case R.id.luminance:
+			fv.setModeSelectReelColor(0);
+			selectColor.getBackground().clearColorFilter();
 			if(!isActivateLumButton){
 				isActivateOnTouch = true;
 				isActivateLumButton = true;
@@ -229,9 +247,12 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 				isActivateLumButton = false;
 				lumButton.getBackground().clearColorFilter();
 			}
+		//	fv.setModeSelectReelColor(0);
 			break;
 			
 		case R.id.saturation:
+			fv.setModeSelectReelColor(0);
+			selectColor.getBackground().clearColorFilter();
 			if(!isActivateSatButton){
 				isActivateOnTouch = true;
 				isActivateSatButton = true;
@@ -247,14 +268,30 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 				isActivateSatButton = false;
 				satButton.getBackground().clearColorFilter();
 			}
+		//	
 			break;
 			
 		case R.id.selectColor:
-			resetAllColorButton();
-			fv.setSelectColor(true);
+			chooseColor.getBackground().clearColorFilter();
+			colorPick.setVisibility(View.INVISIBLE);
+			isOpenChooseColor = false;
+			if(fv.getModeSelectReelColor() == 0){
+				fv.setModeSelectReelColor(1);
+				selectColor.getBackground().setColorFilter(new PorterDuffColorFilter(Color.GREEN,Mode.SRC_ATOP));
+			}
+			else{
+				fv.setModeSelectReelColor(0);
+				selectColor.getBackground().clearColorFilter();
+			}
+			
 			break;
 			
 		case R.id.colorButton:
+			
+			colorPick.setOldCenterColor(fv.getPixelColor());
+			fv.setModeSelectReelColor(0);
+			selectColor.getBackground().clearColorFilter();
+			
 			if(!isOpenChooseColor){
 				isOpenChooseColor = true;
 				isActivateOnTouch = true;
@@ -302,6 +339,14 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 
 	public void setFv(FlamingoViewer fv) {
 		this.fv = fv;
+	}
+
+	public int getSelectPixelColor() {
+		return selectPixelColor;
+	}
+
+	public void setSelectPixelColor(int selectPixelColor) {
+		this.selectPixelColor = selectPixelColor;
 	}
 	
 	

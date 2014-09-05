@@ -70,6 +70,7 @@ void main(){
 	//DEBUG
 	float limit = 1.1;//(1.0-p.y);
 	
+
 	
 	vec3 col = texture2D(sTexture, vTextureCoord).rgb;
 	
