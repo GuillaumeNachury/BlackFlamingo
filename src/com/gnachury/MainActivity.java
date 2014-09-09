@@ -14,6 +14,7 @@ import android.graphics.PorterDuffColorFilter;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -395,6 +396,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener, M
 	@Override
 	public void callback(boolean result, File pathPicture) {
 		final File pathImage = pathPicture;
+		//File mediaStorageDir = new File(Environment.getExternalStorageDirectory(Environment.DIRECTORY_PICTURES), "BlackFlamingo");
+		
 		((Activity) MainActivity.this).runOnUiThread(new Runnable() {
 		    @Override
 		    public void run() {

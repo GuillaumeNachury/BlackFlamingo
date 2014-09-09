@@ -14,6 +14,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -21,12 +22,13 @@ import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
+import android.net.Uri;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.os.Environment;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.SurfaceHolder;
 
 import com.gnachury.GlobalApplication;
 import com.gnachury.MainActivity;
@@ -120,6 +122,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 		_currentTex.setOnFrameAvailableListener(this);
 		
 		_camera.stopPreview();
+		
 		try {
 		
 			_camera.setPreviewTexture(_currentTex);
@@ -337,8 +340,9 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	    {
 	    	rootmedia = GlobalApplication.getRootmedia();
 	    	pathPicture = new File (rootmedia.getPath()+ File.separator + "/"+ name);
-	    	FileOutputStream fos=new FileOutputStream(rootmedia.getPath()+ File.separator + "/"+ name);
+	    	FileOutputStream fos=new FileOutputStream(pathPicture);
 	        bmp.compress(CompressFormat.PNG, 100, fos);
+	 
 	        try
 	        {
 	            fos.flush();
@@ -351,6 +355,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	        try
 	        {
 	            fos.close();
+	            _context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + pathPicture)));
 	        }
 	        catch (IOException e)
 	        {

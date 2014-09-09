@@ -15,7 +15,7 @@ public class GlobalApplication extends Application{
 	public void onCreate() 
 	{
 		super.onCreate();
-		rootmedia = new File(Environment.getExternalStorageDirectory(), "/Pictures/BlackFlamingo");
+		rootmedia = new File(Environment.getExternalStorageDirectory(), "/BlackFlamingo");
 		if (!rootmedia.exists()) {
 			boolean foldercreate = rootmedia.mkdir() ;
 			Log.e("GlobalApp", "folder = " + foldercreate);
@@ -47,11 +47,4 @@ public class GlobalApplication extends Application{
 	public static void setRootmedia(File rootmedia) {
 		GlobalApplication.rootmedia = rootmedia;
 	}
-	
-	
-
-		
-
-	
-
 }
