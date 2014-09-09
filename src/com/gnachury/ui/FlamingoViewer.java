@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -13,19 +16,19 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.Bitmap.CompressFormat;
+import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.opengl.GLES20;
-import android.opengl.GLException;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
-import android.os.Environment;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.SurfaceHolder;
 
+import com.gnachury.GlobalApplication;
 import com.gnachury.MainActivity;
 import com.gnachury.ShaderParam;
 import com.gnachury.blackflamingo.R;
@@ -39,6 +42,8 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	private boolean selectColor = false;
 	private int frameId = 0;
 	private String eventMotion = "";
+	private File pathPicture;
+	private File rootmedia;
 
 	private final Shader mOffscreenShader = new Shader();
 	private float[] mTransformM = new float[16];
@@ -65,6 +70,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	private float _selectedColor = 120.0f;
 	private float _newHue = (float) ((1.0/360.0)*300.0);
 	
+	private boolean takePicture;
 
 
 	public FlamingoViewer(Context context) {
@@ -85,6 +91,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 		_quad = new Quad();
 		setEGLContextClientVersion(2);
 		setRenderer(this);
+		setPreserveEGLContextOnPause(true);
 		setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 		
 	}
@@ -98,6 +105,7 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 			e.printStackTrace();
 		}
 		_camera = Camera.open();
+		
 		
 	}
 
@@ -136,8 +144,12 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 			_cameraH = psize.get(i).height;		
 
 		}
-		//param.setRecordingHint(true);
 		
+		String deviceName = android.os.Build.MODEL;
+
+		if(deviceName.equalsIgnoreCase("Nexus 4")){
+			param.setRecordingHint(true);
+		}		
 		
 		if(_context.getResources().getConfiguration().orientation == 
 				Configuration.ORIENTATION_PORTRAIT){
@@ -160,7 +172,6 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 		requestRender();
 	}
 	
-	
 
 	@Override
 	public synchronized void onDrawFrame(GL10 gl) {
@@ -173,11 +184,13 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 		else{
 			frameId = 0;
 		}
-		if(selectColor && modeSelectReelColor == 1){
-			//SavePNG(glViewPortW/2,glViewPortH/2,10,10,"Shader_"+Math.random()+".png",gl);
+		if(!takePicture && selectColor && modeSelectReelColor == 1){
 			pixelColor = getPixel(gl);					
-			Log.e("Flamino", "pixel = " + pixelColor);
 			selectColor = false;
+		}
+		if(takePicture){
+			SavePNG(glViewPortW/2,glViewPortH/2,10,10,"Shader_"+Math.random()+".png",gl);
+			setTakePicture(false);
 		}
 
 		GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -289,49 +302,41 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 		return pix1;
 	}
 	
-	public static Bitmap SavePixels(int x, int y, int w, int h, GL10 gl)
+	public Bitmap SavePixels(int x, int y, int w, int h, GL10 gl)
 	{  
-	    int b[]=new int[w*h];
-	    int bt[]=new int[w*h];
-	    IntBuffer ib=IntBuffer.wrap(b);
-	    ib.position(0);
-	    gl.glReadPixels(x, y, w, h, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, ib);
+		int size = glViewPortW * glViewPortH;
+		ByteBuffer buf = ByteBuffer.allocateDirect(size * 4);
+		buf.order(ByteOrder.nativeOrder());
+		gl.glReadPixels(0, 0, glViewPortW, glViewPortH, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, buf);
+		int data[] = new int[size];
+		buf.asIntBuffer().get(data);
+		buf = null;
+		Bitmap bitmap = Bitmap.createBitmap(glViewPortW, glViewPortH, Bitmap.Config.RGB_565);
+		bitmap.setPixels(data, size-glViewPortW, -glViewPortW, 0, 0, glViewPortW, glViewPortH);
+		data = null;
 
-	    /*  remember, that OpenGL bitmap is incompatible with 
-	        Android bitmap and so, some correction need.
-	     */   
-	    for(int i=0; i<h; i++)
-	    {         
-	        for(int j=0; j<w; j++)
-	        {
-	            int pix=b[0];
-	            int pb=(pix>>16)&0xff;
-	            int pr=(pix<<16)&0x00ff0000;
-	            int pix1=(pix&0xff00ff00) | pr | pb;
-	            bt[(h-i-1)*w+j]=pix1;
-	            float[] colors = new float[3];
-	    		Color.colorToHSV(pix1, colors);
-	    		//set the angle value 
-	        	int selectColorPickerAngle = (int) colors[0];
-	            Log.e("Flaming","color = " + pix1 + "__selectColorPickerAngle = " + selectColorPickerAngle );
-	        }
-	    }              
-	    Bitmap sb= Bitmap.createBitmap(bt, w, h, Bitmap.Config.ARGB_8888);
-	    return sb;
+		short sdata[] = new short[size];
+		ShortBuffer sbuf = ShortBuffer.wrap(sdata);
+		bitmap.copyPixelsToBuffer(sbuf);
+		for (int i = 0; i < size; ++i) {
+		    //BGR-565 to RGB-565
+		    short v = sdata[i];
+		    sdata[i] = (short) (((v&0x1f) << 11) | (v&0x7e0) | ((v&0xf800) >> 11));
+		}
+		sbuf.rewind();
+		bitmap.copyPixelsFromBuffer(sbuf);
+		return bitmap;
 	}
 
-	public  void SavePNG(int x, int y, int w, int h, String name, GL10 gl)
+	public void SavePNG(int x, int y, int w, int h, String name, GL10 gl)
 	{
 	
 	    Bitmap bmp=SavePixels(x,y,w,h,gl);
+	    
 	    try
 	    {
-	    	File rootmedia = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "BlackFlamingo");
-	    	Log.e("FlamingoV",rootmedia.getPath()+ File.separator + name);
-	    	if (!rootmedia.exists()) {
-				rootmedia.mkdirs() ;
-
-			}
+	    	rootmedia = GlobalApplication.getRootmedia();
+	    	pathPicture = new File (rootmedia.getPath()+ File.separator + "/"+ name);
 	    	FileOutputStream fos=new FileOutputStream(rootmedia.getPath()+ File.separator + "/"+ name);
 	        bmp.compress(CompressFormat.PNG, 100, fos);
 	        try
@@ -357,7 +362,11 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	    {
 	        // TODO Auto-generated catch block
 	        e.printStackTrace();
-	    }              
+	    }    
+	  
+       MainActivity act =  (MainActivity) _context;
+       act.callback(true,pathPicture);
+	  
 	}
 	
 	
@@ -392,5 +401,32 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 	public void setPixelColor(int pixelColor) {
 		this.pixelColor = pixelColor;
 	}
+
+	public boolean isTakePicture() {
+		return takePicture;
+	}
+
+	public void setTakePicture(boolean takePicture) {
+		this.takePicture = takePicture;
+	}
+	
+	@Override
+	public void onPause(){
+		super.onPause();
+		_camera.stopPreview();
+		_camera.release();
+	}
+	
+	@Override
+	public void onResume(){
+		super.onResume();
+		if(_camera != null){
+			Log.e("Flamino", "onResume");
+			_camera = Camera.open();
+		}
+		
+	}
+
+	
 
 }

@@ -1,11 +1,21 @@
 package com.gnachury;
 
+import java.io.File;
+
+import android.app.Activity;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffColorFilter;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -15,6 +25,7 @@ import android.view.View.OnTouchListener;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gnachury.blackflamingo.R;
 import com.gnachury.library.ColorPicker;
@@ -25,11 +36,11 @@ import com.gnachury.ui.FlamingoViewer;
  * @author Guillaume
  *
  */
-public class MainActivity extends FragmentActivity implements OnClickListener{
+public class MainActivity extends FragmentActivity implements OnClickListener, MyListener{
 
 	private final static String tag = "MainActivity";
 	private FlamingoViewer fv;
-	private ImageView tolButton, satButton, lumButton, selectColor, chooseColor, crosshair;
+	private ImageView tolButton, satButton, lumButton, selectColor, chooseColor, crosshair, camera;
 	private float screenHeight;
 	private float tolValue = 0;
 	private float satValue = 0;
@@ -45,6 +56,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 	private int selectPixelColor;
 	private float selectColorPickerAngle;
 	private ColorPicker colorPick;
+	private GlobalApplication application;
+	private boolean succesPicture;
+	private NotificationManager myNotificationManager;
+
 
 	
 	@Override
@@ -55,6 +70,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.activity_main);
 		setFv((FlamingoViewer)findViewById(R.id.renderer_view));
+		
 		tolButton = (ImageView)findViewById(R.id.tolerance);
 		satButton = (ImageView)findViewById(R.id.saturation);
 		lumButton = (ImageView)findViewById(R.id.luminance);
@@ -64,6 +80,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 		colorPick = (ColorPicker)findViewById(R.id.color_picker);
 		colorPick.setVisibility(View.INVISIBLE);
 		crosshair = (ImageView)findViewById(R.id.crosshair);
+		camera = (ImageView)findViewById(R.id.camera);
 
 		//Add listener 
 		tolButton.setOnClickListener(this);
@@ -71,11 +88,13 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 		lumButton.setOnClickListener(this);
 		selectColor.setOnClickListener(this);
 		chooseColor.setOnClickListener(this);
+		camera.setOnClickListener(this);
 		
 		//initial mode select
 		selectColor.getBackground().setColorFilter(new PorterDuffColorFilter(Color.GREEN,Mode.SRC_ATOP));
 		fv.setModeSelectReelColor(1);
 		fv.setSelectColor(true);
+		
 		//setOpacity 128 = 50%
 		tolButton.getBackground().setAlpha(128);
 		satButton.getBackground().setAlpha(128);
@@ -88,11 +107,22 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				if(isActivateOnTouch){
+					Log.e(tag, "isActivateOnTouch");
 					handleTouch(event);		
-				}				
+				}	
+			/*	if(!isActivateOnTouch && fv.isTakePicture()){
+					Log.e(tag, "isTakePicture");
+
+					handleTouch(event);		
+				}
+			*/
 				return true;
 			}
 		});
+		
+		if(succesPicture){
+			Log.e(tag, "succesPicture");
+		}
 		
 		colorPick.setOnColorChangedListener(new OnColorChangedListener() {
 	        @Override
@@ -115,9 +145,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 	
 	//Method touchEvent
 	public void handleTouch(MotionEvent m)
-	{
-		Log.e("Flamino", "pixel = " + fv.getPixelColor());
-		
+	{	
+			Log.e(tag, "handletouche");
 	    	int pointerCount = m.getPointerCount();
 	    	//Screen dimensions
 	    	Display display = getWindowManager().getDefaultDisplay(); 
@@ -148,6 +177,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 	    				break;	
 	    			case MotionEvent.ACTION_POINTER_DOWN:
 	    				actionString = "PNTR DOWN";
+	    				//fv.setTakePicture(true);
 	    				break;
 	    			case MotionEvent.ACTION_POINTER_UP:
 	        			actionString = "PNTR UP";
@@ -184,8 +214,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 	    				actionString = "";
 	    		}
 	    		//debug 
-	    		String touchStatus = "Action: " + actionString + " Index: " + actionIndex + " ID: " + id + " X: " + x + " Y: " + y;
-	    		Log.v("MainActivity", touchStatus);
+	    	//	String touchStatus = "Action: " + actionString + " Index: " + actionIndex + " ID: " + id + " X: " + x + " Y: " + y;
+	    	//	Log.e("MainActivity", touchStatus);
 	    	}
 	}
 
@@ -193,12 +223,14 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
+		fv.onResume();
 	}
 
 	@Override
 	protected void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
+		fv.onPause();
 	}
 
 	@Override
@@ -313,6 +345,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 				colorPick.setVisibility(View.INVISIBLE);
 			}
 			break;
+			
+		case R.id.camera:
+			fv.setTakePicture(true);
 
 
 		default:
@@ -332,8 +367,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 		satButton.getBackground().clearColorFilter();		
 	}
 	
-	
-	
 
 	public FlamingoViewer getFv() {
 		return fv;
@@ -350,7 +383,75 @@ public class MainActivity extends FragmentActivity implements OnClickListener{
 	public void setSelectPixelColor(int selectPixelColor) {
 		this.selectPixelColor = selectPixelColor;
 	}
-	
-	
 
+	public boolean isSuccesPicture() {
+		return succesPicture;
+	}
+
+	public void setSuccesPicture(boolean succesPicture) {
+		this.succesPicture = succesPicture;
+	}
+
+	@Override
+	public void callback(boolean result, File pathPicture) {
+		final File pathImage = pathPicture;
+		((Activity) MainActivity.this).runOnUiThread(new Runnable() {
+		    @Override
+		    public void run() {
+		    	createNotification(pathImage);
+				Toast.makeText(MainActivity.this, "Capture Image", Toast.LENGTH_SHORT).show();
+		    }
+		});
+	}
+	
+	public void createNotification(File path) {
+		Log.e(tag, "path = " + path);
+		// Invoking the default notification service
+	      NotificationCompat.Builder  mBuilder = new NotificationCompat.Builder(this);	
+	    //Define sound URI
+	     //Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+	      Uri sound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.blackflamingo_soundnotification );
+	 
+	      mBuilder.setContentTitle("Image sauvegardée");
+	      mBuilder.setContentText("Cliquez pour visionner l'image");
+	      mBuilder.setTicker("BlackFlamingo !");
+	      mBuilder.setAutoCancel(true);
+	      Log.e(tag, sound.toString());
+	      mBuilder.setSound(sound);
+	      mBuilder.setSmallIcon(R.drawable.ic_launcher);
+
+	      // Increase notification number every time a new notification arrives 
+	      //mBuilder.setNumber(++numMessagesOne);
+	      
+	      // Creates an explicit intent for an Activity in your app 
+	      //Intent resultIntent = new Intent(this, NotificationReceiverActivity.class);
+	      //resultIntent.putExtra("notificationId", 111);
+
+	      Intent intent = new Intent(Intent.ACTION_VIEW);
+	      intent.setDataAndType(Uri.fromFile(path), "image/*");
+	      
+	      PendingIntent contentIntent = PendingIntent.getActivity(this.getApplicationContext(), 0, intent, PendingIntent.FLAG_ONE_SHOT);
+	      /*This ensures that navigating backward from the Activity leads out of the app to Home page
+	      TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+
+	      // Adds the back stack for the Intent
+	      stackBuilder.addParentStack(NotificationReceiverActivity.class);
+
+	      // Adds the Intent that starts the Activity to the top of the stack
+	      stackBuilder.addNextIntent(resultIntent);
+	      PendingIntent resultPendingIntent =
+	         stackBuilder.getPendingIntent(
+	            0,
+	            PendingIntent.FLAG_ONE_SHOT //can only be used once
+	         );
+	      // start the activity when the user clicks the notification text
+	      mBuilder.setContentIntent(resultPendingIntent);
+	*/
+	    		  
+	      mBuilder.setContentIntent(contentIntent);
+	      myNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+	      // pass the Notification object to the system 
+	      myNotificationManager.notify(111, mBuilder.build());
+	}
 }

@@ -83,4 +83,13 @@
             android:layout_centerInParent="true"
             android:background="@android:color/transparent" />
 
+        <ImageView
+            android:id="@+id/camera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/saturation"
+            android:layout_marginLeft="29dp"
+            android:src="@drawable/camera" />
+
 </RelativeLayout>
