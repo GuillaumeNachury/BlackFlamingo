@@ -132,21 +132,25 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 		}
 		
 		Camera.Parameters param = _camera.getParameters();
-		List<Size> psize = param.getSupportedPreviewSizes();
-		if(psize.size() > 0 ){
+		List<Size> previewSize = param.getSupportedPreviewSizes();
+	//	Camera.Size previewSize = psize.get(0);
+		if(previewSize.size() > 0 ){
 			int i;
-			for (i = 0; i < psize.size(); i++){
-				if(psize.get(i).width < width || psize.get(i).height < height)
+			for (i = 0; i < previewSize.size(); i++){
+				if(previewSize.get(i).width < width || previewSize.get(i).height < height)
 					break;
 			}
 			if(i>0)
 				i--;
-			param.setPreviewSize(psize.get(i).width, psize.get(i).height);
+			param.setPreviewSize(previewSize.get(13).width, previewSize.get(13).height);
 			
-			_cameraW = psize.get(i).width;
-			_cameraH = psize.get(i).height;		
+			_cameraW = previewSize.get(i).width;
+			_cameraH = previewSize.get(i).height;		
 
+		
 		}
+		//_cameraW = previewSize.width;
+		//_cameraH = previewSize.height;
 		
 		String deviceName = android.os.Build.MODEL;
 
@@ -167,8 +171,8 @@ public class FlamingoViewer extends GLSurfaceView implements GLSurfaceView.Rende
 		}
 		
 		param.setFocusMode("continuous-picture");
-		
-		_camera.setParameters(param);	
+		Log.e("flaminofviewer", ""+param);
+	//	_camera.setParameters(param);	
 		
 		
 		_camera.startPreview();

@@ -253,7 +253,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener, M
 				tolButton.getBackground().setColorFilter(new PorterDuffColorFilter(Color.GREEN,Mode.SRC_ATOP));
 				lumButton.getBackground().clearColorFilter();
 				satButton.getBackground().clearColorFilter();
-			//	chooseColor.getBackground().clearColorFilter();
+				chooseColor.getBackground().clearColorFilter();
+				selectColor.getBackground().clearColorFilter();
+				isOpenChooseColor = false;
+				colorPick.setVisibility(View.INVISIBLE);
 			}
 			else{
 				isActivateOnTouch = false;
@@ -265,7 +268,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, M
 			
 		case R.id.luminance:
 			fv.setModeSelectReelColor(0);
-			selectColor.getBackground().clearColorFilter();
+			
 			if(!isActivateLumButton){
 				isActivateOnTouch = true;
 				isActivateLumButton = true;
@@ -274,7 +277,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener, M
 				tolButton.getBackground().clearColorFilter();
 				lumButton.getBackground().setColorFilter(new PorterDuffColorFilter(Color.GREEN,Mode.SRC_ATOP));
 				satButton.getBackground().clearColorFilter();
-			//	chooseColor.getBackground().clearColorFilter();
+				chooseColor.getBackground().clearColorFilter();
+				selectColor.getBackground().clearColorFilter();
+				isOpenChooseColor = false;
+				colorPick.setVisibility(View.INVISIBLE);
 			}
 			else{
 				isActivateOnTouch = false;
@@ -286,7 +292,6 @@ public class MainActivity extends FragmentActivity implements OnClickListener, M
 			
 		case R.id.saturation:
 			fv.setModeSelectReelColor(0);
-			selectColor.getBackground().clearColorFilter();
 			if(!isActivateSatButton){
 				isActivateOnTouch = true;
 				isActivateSatButton = true;
@@ -294,8 +299,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener, M
 				isActivateLumButton = false;
 				tolButton.getBackground().clearColorFilter();
 				lumButton.getBackground().clearColorFilter();
-			//	chooseColor.getBackground().clearColorFilter();
+				chooseColor.getBackground().clearColorFilter();
 				satButton.getBackground().setColorFilter(new PorterDuffColorFilter(Color.GREEN,Mode.SRC_ATOP));
+				selectColor.getBackground().clearColorFilter();
+				isOpenChooseColor = false;
+				colorPick.setVisibility(View.INVISIBLE);
 			}
 			else{
 				isActivateOnTouch = false;
@@ -306,13 +314,15 @@ public class MainActivity extends FragmentActivity implements OnClickListener, M
 			break;
 			
 		case R.id.selectColor:
-			chooseColor.getBackground().clearColorFilter();
-			colorPick.setVisibility(View.INVISIBLE);
-			isOpenChooseColor = false;
+			
 			if(fv.getModeSelectReelColor() == 0){
 				crosshair.setVisibility(View.VISIBLE);
 				fv.setModeSelectReelColor(1);
 				selectColor.getBackground().setColorFilter(new PorterDuffColorFilter(Color.GREEN,Mode.SRC_ATOP));
+				chooseColor.getBackground().clearColorFilter();
+				colorPick.setVisibility(View.INVISIBLE);
+				isOpenChooseColor = false;
+				resetParamsButton();
 			}
 			else{
 				fv.setModeSelectReelColor(0);
@@ -330,12 +340,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener, M
 			if(!isOpenChooseColor){
 				isOpenChooseColor = true;
 				isActivateOnTouch = true;
-				isActivateSatButton = true;
-				isActivateTolButton = false;
-				isActivateLumButton = false;
-				tolButton.getBackground().clearColorFilter();
-				lumButton.getBackground().clearColorFilter();
-				satButton.getBackground().clearColorFilter();
+				resetParamsButton();
 				chooseColor.getBackground().setColorFilter(new PorterDuffColorFilter(Color.GREEN,Mode.SRC_ATOP));
 				colorPick.setVisibility(View.VISIBLE);
 			}
@@ -358,11 +363,10 @@ public class MainActivity extends FragmentActivity implements OnClickListener, M
 	}
 	
 	
-	public void resetAllColorButton(){
+	public void resetParamsButton(){
 		isActivateSatButton = false;
 		isActivateTolButton = false;
 		isActivateLumButton = false;
-		isOpenChooseColor = false;
 		tolButton.getBackground().clearColorFilter();
 		lumButton.getBackground().clearColorFilter();
 		satButton.getBackground().clearColorFilter();		
